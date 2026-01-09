@@ -23,6 +23,10 @@ afterwards you can build the package with:
 uv build
 ```
 
+Which will create the package _wheel_ (file ending `.whl`) in the `dist/` directory.
+This package can ordinarily be installed with `pip install` and integrated into existing Python applications 
+or it can be run standalone using `python -m`.
+
 Alternatively you can test FRCM directly by running:
 
 ```shell
@@ -38,5 +42,5 @@ The implementation is organised into the following main folders:
 - `datamodel` - contains an implementation of the data model used for weather data and fire risk indications.
 - `fireriskmodel` contains an implementation of the underlying fire risk model.
 
-The main API for the implementation is in the file `src/frcm/frcapi.py`
+The central method of the application is the method `compute()` in `fireriskmodel.compute`.
 

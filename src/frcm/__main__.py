@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 from frcm.datamodel.model import WeatherData
-from frcm.frcapi import FireRiskAPI
+from frcm.fireriskmodel.compute import compute
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 3:
@@ -15,10 +15,9 @@ if __name__ == "__main__":
         print("Given file did not contain any data points! Please check the input format! Aborting...")
         sys.exit(1)
 
-    api = FireRiskAPI()
     print(f"Computing FireRisk for given data in '{file.absolute()}' ({len(wd.data)} datapoints)", end="\n\n")
 
-    risks = api.compute(wd)
+    risks = compute(wd)
 
     if len(sys.argv) == 3:
         output = Path(sys.argv[2])
