@@ -24,27 +24,21 @@ class FireRiskAPI:
 
         observations = self.client.fetch_observations(location, start=start_time, end=time_now)
 
-        print(observations)
-
         forecast = self.client.fetch_forecast(location)
 
-        print(forecast)
-
         wd = WeatherData(created=time_now, observations=observations, forecast=forecast)
-
-        print(wd.to_json())
 
         prediction = self.compute(wd)
 
         return prediction
 
-    def compute_now_period(self, location: Location, obs_delta: datetime.timedelta, fct_delta: datetime.timedelta):
-        pass
-
-    def compute_period(self, location: Location, start: datetime, end: datetime) -> FireRiskPrediction:
-        pass
-
-    def compute_period_delta(self, location: Location, start: datetime, delta: datetime.timedelta) -> FireRiskPrediction:
-        pass
+    # def compute_now_period(self, location: Location, obs_delta: datetime.timedelta, fct_delta: datetime.timedelta):
+    #     pass
+    #
+    # def compute_period(self, location: Location, start: datetime, end: datetime) -> FireRiskPrediction:
+    #     pass
+    #
+    # def compute_period_delta(self, location: Location, start: datetime, delta: datetime.timedelta) -> FireRiskPrediction:
+    #     pass
 
 

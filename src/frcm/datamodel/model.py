@@ -1,46 +1,47 @@
+from pathlib import Path
 import datetime
 
 from pydantic import BaseModel
 
 
 class Location(BaseModel):
-
     latitude: float
     longitude: float
 
 
 class WeatherDataPoint(BaseModel):
-
     temperature: float
     humidity: float
     wind_speed: float
     timestamp: datetime.datetime
 
-    def __str__(self):
+    @classmethod
+    def csv_header(cls) -> str:
+        return "timestamp,temperature,humidity,wind_speed"
 
-        format_str = f'WeatherData[{self.timestamp}] {self.temperature, self.humidity, self.wind_speed}]'
-
-        return format_str
+    def csv_line(self) -> str:
+        return f"{self.timestamp.isoformat()},{self.temperature},{self.humidity},{self.wind_speed}"
 
 
 class Observations(BaseModel):
-
-    source: str
-    location: Location
+    # source: str
+    # location: Location
     data: list[WeatherDataPoint]
 
-    def __str__(self):
-        format_str = f'Observations [Source: {self.source} @ Location: {self.location}]\n'
 
-        # Join all data points using '\n' as a separator
-        data_strings = '\n'.join(map(str, self.data))
-
-        return format_str + data_strings + '\n'
+    def write_csv(self, target: Path):
+        handle = open(target, "w+")
+        handle.write(WeatherDataPoint.csv_header())
+        handle.write('\n')
+        for d in self.data:
+            handle.write(d.csv_line())
+            handle.write('\n')
+        handle.close()
 
 
 class Forecast(BaseModel):
 
-    location: Location
+    # location: Location
     data: list[WeatherDataPoint]
 
     def __str__(self):
@@ -53,39 +54,53 @@ class Forecast(BaseModel):
 
 
 class WeatherData(BaseModel):
-
-    created: datetime.datetime
-
+    # created: datetime.datetime
     observations: Observations
     forecast: Forecast
 
     def to_json(self):
         return self.model_dump_json()
 
+    def write_csv(self, target: Path):
+        handle = open(target, "w+")
+        handle.write(WeatherDataPoint.csv_header())
+        handle.write('\n')
+        for d in self.observations.data:
+            handle.write(d.csv_line())
+            handle.write('\n')
+        for d in self.forecast.data:
+            handle.write(d.csv_line())
+            handle.write('\n')
+        handle.close()
+
+
 
 class FireRisk(BaseModel):
-
     timestamp: datetime.datetime
     ttf: float
 
-    def __str__(self):
-        format_str = f'FireRisks[{self.timestamp} {self.ttf}]'
+    @classmethod
+    def csv_header(cls) -> str:
+        return "timestamp,ttf"
 
-        return format_str
+    def csv_line(self) -> str:
+        return f"{self.timestamp.isoformat()},{self.ttf}"
+
 
 
 class FireRiskPrediction(BaseModel):
-
-    location: Location
+    # location: Location
     firerisks: list[FireRisk]
 
-    def __str__(self):
-        format_str = f'FireRiskPrediction[{self.location}]\n'
+    def __str__(self) -> str:
+        return "\n".join([FireRisk.csv_header()] + [r.csv_line() for r in self.firerisks])
 
-        # Generate list of formatted data points
-        data_str = [str(data_point) for data_point in self.firerisks]
+    def write_csv(self, target: Path):
+        handle = open(target, "w+")
+        handle.write(FireRisk.csv_header())
+        handle.write('\n')
+        for r in self.firerisks:
+            handle.write(r.csv_line())
+            handle.write('\n')
+        handle.close()
 
-        # Join the list of formatted data points
-        format_str += '\n'.join(data_str)
-
-        return format_str

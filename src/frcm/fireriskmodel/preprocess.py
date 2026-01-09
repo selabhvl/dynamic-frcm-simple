@@ -4,6 +4,9 @@ import numpy as np
 
 
 def combine_obs_fct(sorted_data_obs, sorted_data_fct, parameter):
+    """
+    generic concatenation
+    """
     obs = [getattr(obj, parameter) for obj in sorted_data_obs]
     fct = [getattr(obj, parameter) for obj in sorted_data_fct]
     combined = obs + fct
@@ -28,6 +31,11 @@ def find_data_gap(*args): # np.array
 
 
 def preprocess(wd: WeatherData):
+    """
+    Transforms the WeatherData domain object into numpy ndarrays
+    which contain the interoplated values w.r.t. temperature, humidity, and wind speed,
+    also a 'cleaning' w.r.t null-values.
+    """
 
     # Should not be necessary, but data is initially sorted according to the timestamps
     sorted_data_obs = sorted(wd.observations.data, key=lambda x: x.timestamp)

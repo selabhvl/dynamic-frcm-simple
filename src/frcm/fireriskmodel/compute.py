@@ -11,14 +11,12 @@ def compute(wd: dm.WeatherData) -> dm.FireRiskPrediction:
 
     # Get interpolated values #TODO (NOTE) The max_time_delta represents the largest gap in missing data (seconds). It can be used to provide suited warning/error message.
     start_time, time_interpolated_sec, temp_interpolated, humidity_interpolated, wind_interpolated, max_time_delta = pp.preprocess(wd)
-    comp_loc = wd.forecast.location
 
     # Compute RH_in and TTF
     rh_in, ttf = compute_fr(temp_interpolated, humidity_interpolated)
 
     # Reduce data to once per hour, but the time is still given as seconds
-    rf = int(
-        3600 / mp.delta_t)  # Reduction factor, i.e., how many intervals per hour. Default delta_t = 720 s, hence rf = 5.
+    rf = int(3600 / mp.delta_t)  # Reduction factor, i.e., how many intervals per hour. Default delta_t = 720 s, hence rf = 5.
     rh_in_hour = rh_in[::rf]  # Average is not computed, values are extracted per hour.
     ttf_in_hour = ttf[::rf]
     time_in_hour = time_interpolated_sec[::rf] # Time is still in seconds but given for every hour.
@@ -30,9 +28,8 @@ def compute(wd: dm.WeatherData) -> dm.FireRiskPrediction:
         firerisk_i = dm.FireRisk(timestamp=timestamps, ttf=ttf_in_hour[i])
         firerisks.append(firerisk_i)
 
-    FireRiskResponse = dm.FireRiskPrediction(location=comp_loc, firerisks=firerisks)
-
-    return FireRiskResponse
+    result = dm.FireRiskPrediction(firerisks=firerisks)
+    return result
 
 
 def compute_fr(temp_c_out, rh_out):
